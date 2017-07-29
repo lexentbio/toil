@@ -46,6 +46,11 @@ def runSetup():
                 'azure==1.0.3'],
             'encryption': [
                 'pynacl==0.3.0'],
+            'postgres': [
+                'inflection==0.3.1',
+                'psycopg2==2.7.3',
+                'boto3==1.4.4'
+            ],
             'google': [
                 'gcs_oauth2_boto_plugin==1.9',
                 botoRequirement],

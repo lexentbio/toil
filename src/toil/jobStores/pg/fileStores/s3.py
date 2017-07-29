@@ -26,9 +26,13 @@ class FileStore(object):
         # So we are fetching the configured region from boto3 client.
         region = self.bucket.meta.client._client_config.region_name
         try:
-            self.bucket.create(CreateBucketConfiguration={
-                'LocationConstraint': region
-            })
+            if region == 'us-east-1':
+                self.bucket.create()
+            else:
+                self.bucket.create(CreateBucketConfiguration={
+                    'LocationConstraint': region
+                })
+
             self.bucket.wait_until_exists()
         except ClientError as e:
             if e.response['Error']['Code'] != 'BucketAlreadyOwnedByYou':
@@ -108,7 +112,7 @@ class FileStore(object):
     ##########################################
 
     def __get_key(self, fileID):
-        return ("%s/%s" % (self.prefix, fileID)).strip('/')
+        return ("%s%s" % (self.prefix, fileID)).strip('/')
 
     def __get_object(self, fileID):
         return self.bucket.Object(self.__get_key(fileID))
