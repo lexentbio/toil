@@ -86,11 +86,16 @@ class MesosExecutor(mesos.interface.Executor):
         pid, job_id = self.runningTasks[taskId]
         if self.workerCleanupInfo is not None:
             workflow_id = self.workerCleanupInfo.workflowID
-            docker_kill_command = "docker kill `docker ps -q -f label=job_id={} -f label=workflow_id={}`".format(
+            docker_stop_command = "docker stop `docker ps -q -f label=job_id={} -f label=workflow_id={}`".format(
                 job_id, workflow_id)
-            p = subprocess.Popen(docker_kill_command, shell=True)
+            p = subprocess.Popen(docker_stop_command, shell=True)
             if p.wait() != 0:
                 log.debug("Couldn't kill docker container with job_id {}, workflow_id: {}".format(job_id, workflow_id))
+            else:
+                docker_rm_command = "docker rm `docker ps -q -a -f label=job_id={} -f label=workflow_id={}`".format(
+                    job_id, workflow_id)
+                p = subprocess.Popen(docker_rm_command, shell=True)
+                p.wait()
 
         try:
             pgid = os.getpgid(pid)

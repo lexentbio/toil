@@ -1234,9 +1234,12 @@ class Job(JobLikeObject):
     ####################################################
 
     def _run(self, jobGraph, fileStore):
+        rv = None
         self.jobGraph = jobGraph
-        rv = self.run(fileStore)
-        self.jobGraph = None
+        try:
+            rv = self.run(fileStore)
+        finally:
+            self.jobGraph = None
         return rv
 
     @contextmanager
