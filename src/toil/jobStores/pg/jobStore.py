@@ -53,10 +53,10 @@ class JobStore(AbstractJobStore):
         with self.conn.cursor() as cur:
             cur.execute("select * from job_store where namespace=%s", (self.namespace,))
             if not bool(cur.rowcount):
-                raise NoSuchJobStoreException(self.url)
+                raise NoSuchJobStoreException(self.namespace)
             cur.execute("select * from file_store where namespace=%s", (self.namespace,))
             if not bool(cur.rowcount):
-                raise NoSuchJobStoreException(self.url)
+                raise NoSuchJobStoreException(self.namespace)
         super(JobStore, self).resume()
         self.fileStore.resume()
         self.conn.commit()
@@ -68,7 +68,7 @@ class JobStore(AbstractJobStore):
                 cur.execute('DELETE FROM file_store WHERE namespace = %s', (self.namespace, ))
             self.fileStore.destroy()
             self.conn.commit()
-            logger.debug('Successfully deleted jobStore:%s' % self.db_url)
+            logger.debug('Successfully deleted jobStore:%s from %s' % (self,namespace, self.db_url))
         except RuntimeError as e:
             # Handle known errors
             self.conn.rollback()
